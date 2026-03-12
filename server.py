@@ -2,6 +2,7 @@ import numpy as np
 from fastapi import FastAPI
 from pydantic import BaseModel
 from fastapi.middleware.cors import CORSMiddleware
+from matplotlib import pyplot as plt
 
 app = FastAPI()
 
@@ -22,9 +23,8 @@ class PixelInput(BaseModel):
     pixels: list
 
 
-def sigmoid(z):
-    return 1 / (1 + np.exp(-z))
-
+def ReLU(Z):
+    return np.maximum(0, Z)
 
 def softmax(z):
     e = np.exp(z - np.max(z))
@@ -35,7 +35,7 @@ def predict(x):
     a = x.reshape(784, 1)
 
     for Wi, bi in zip(W[:-1], b[:-1]):
-        a = sigmoid(Wi @ a + bi)
+        a = ReLU(Wi @ a + bi)
 
     z = W[-1] @ a + b[-1]
     a = softmax(z)
@@ -45,8 +45,13 @@ def predict(x):
 
 @app.post("/predict")
 def predict_digit(data: PixelInput):
-    x = np.array(data.pixels)
-
-    digit = predict(x)
+    x = data.pixels
+    print(x)
+    current_image = np.array(x).T / 255.
+    current_image = current_image.reshape((28, 28))
+    plt.gray()
+    plt.imshow(current_image, interpolation='nearest')
+    plt.show()
+    digit = predict(current_image)
 
     return {"digit": digit}
