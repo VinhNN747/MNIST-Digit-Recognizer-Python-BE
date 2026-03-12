@@ -46,12 +46,11 @@ def predict(x):
 @app.post("/predict")
 def predict_digit(data: PixelInput):
     x = data.pixels
-    print(x)
     current_image = np.array(x).T / 255.
     current_image = current_image.reshape((28, 28))
-    plt.gray()
-    plt.imshow(current_image, interpolation='nearest')
-    plt.show()
+    # plt.gray()
+    # plt.imshow(current_image, interpolation='nearest')
+    # plt.show()
     digit = predict(current_image)
 
     return {"digit": digit}
